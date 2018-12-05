@@ -12,7 +12,7 @@ func main() {
 	lines := readInput()
 
 	exo1(lines)
-
+	exo2(lines)
 }
 
 func readInput() []string {
@@ -68,4 +68,39 @@ func exo1(lines []string) {
 	}
 
 	fmt.Println(idsWithTwoLetters * idsWithThreeLetters)
+}
+
+func exo2(lines []string) {
+
+	for i := 0; i < len(lines); i++ {
+		for j := i + 1; j < len(lines); j++ {
+
+			matches, commonLetters := compare(lines[i], lines[j])
+
+			if matches {
+				for _, l := range commonLetters {
+					fmt.Printf("%c", l)
+					fmt.Printf("\n")
+				}
+				break
+			}
+		}
+	}
+}
+
+func compare(lineA, lineB string) (bool, []byte) {
+	commonLetters := []byte{}
+
+	for i := 0; i < len(lineA); i++ {
+		if lineA[i] == lineB[i] {
+			commonLetters = append(commonLetters, lineA[i])
+		}
+
+	}
+
+	if len(commonLetters) == len(lineA)-1 {
+		return true, commonLetters
+	}
+
+	return false, commonLetters
 }
