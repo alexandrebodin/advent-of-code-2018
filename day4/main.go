@@ -37,6 +37,68 @@ func (a events) Less(i, j int) bool {
 }
 
 func main() {
+
+	sleepingTimes := readInput()
+
+	exo1(sleepingTimes)
+	exo2(sleepingTimes)
+}
+
+func exo1(sleepingTimes map[int][]int) {
+	var maxId int
+	max := 0
+	for guardId, guard := range sleepingTimes {
+		total := 0
+		for _, v := range guard {
+			total += v
+		}
+
+		if total > max {
+			max = total
+			maxId = guardId
+		}
+	}
+
+	maxMinute := 0
+	maxMinuteVal := 0
+	for i, v := range sleepingTimes[maxId] {
+		if v > maxMinuteVal {
+			maxMinuteVal = v
+			maxMinute = i
+		}
+	}
+
+	fmt.Println(maxId, maxMinute, maxId*maxMinute)
+
+}
+
+func exo2(sleepingTimes map[int][]int) {
+	var maxId int
+	globalMaxMinute := 0
+	max := 0
+	for guardId, guard := range sleepingTimes {
+
+		maxMinute := 0
+		maxMinuteVal := 0
+		for i, v := range guard {
+			if v > maxMinuteVal {
+				maxMinuteVal = v
+				maxMinute = i
+			}
+		}
+
+		if maxMinuteVal > max {
+			max = maxMinuteVal
+			maxId = guardId
+			globalMaxMinute = maxMinute
+		}
+	}
+
+	fmt.Println(maxId, globalMaxMinute, maxId*globalMaxMinute)
+
+}
+
+func readInput() map[int][]int {
 	fi, err := os.Open("./input.txt")
 	check(err)
 	defer fi.Close()
@@ -112,28 +174,5 @@ func main() {
 		}
 	}
 
-	var maxId int
-	max := 0
-	for guardId, guard := range sleepingTimes {
-		total := 0
-		for _, v := range guard {
-			total += v
-		}
-
-		if total > max {
-			max = total
-			maxId = guardId
-		}
-	}
-
-	maxMinute := 0
-	maxMinuteVal := 0
-	for i, v := range sleepingTimes[maxId] {
-		if v > maxMinuteVal {
-			maxMinuteVal = v
-			maxMinute = i
-		}
-	}
-
-	fmt.Println(maxId, maxMinute, maxId*maxMinute)
+	return sleepingTimes
 }
