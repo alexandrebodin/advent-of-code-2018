@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -57,7 +59,81 @@ func main() {
 
 	sort.Sort(eventsList)
 
-	for _, event := range eventsList {
-		fmt.Println(event.timestamp.Format("01-02 15:04"), event.desc)
+	sleepingTimes := map[int][]int{}
+
+	for i := 0; i < len(eventsList); {
+		event := eventsList[i]
+
+		if strings.HasPrefix(event.desc, "Guard") {
+			guardId, err := strconv.Atoi(strings.Split(event.desc, " ")[1][1:])
+			check(err)
+
+			if _, ok := sleepingTimes[guardId]; !ok {
+				sleepingTimes[guardId] = make([]int, 59)
+			}
+			currentTime := 0
+
+			for j := i + 1; ; j++ {
+				if j == len(eventsList) {
+					i = j
+					break
+				}
+
+				e := eventsList[j]
+
+				if strings.HasPrefix(e.desc, "Guard") {
+					i = j
+					break
+				}
+
+				switch e.desc {
+				case "falls asleep":
+					{
+						for i := currentTime; i < e.timestamp.Minute(); i++ {
+							sleepingTimes[guardId][i] += 0
+						}
+						currentTime = e.timestamp.Minute()
+					}
+
+				case "wakes up":
+					{
+						for i := currentTime; i < e.timestamp.Minute(); i++ {
+							sleepingTimes[guardId][i] += 1
+						}
+						currentTime = e.timestamp.Minute()
+					}
+				}
+
+			}
+
+			for i := currentTime; i < 59; i++ {
+				sleepingTimes[guardId][i] += 0
+			}
+		}
 	}
+
+	var maxId int
+	max := 0
+	for guardId, guard := range sleepingTimes {
+		total := 0
+		for _, v := range guard {
+			total += v
+		}
+
+		if total > max {
+			max = total
+			maxId = guardId
+		}
+	}
+
+	maxMinute := 0
+	maxMinuteVal := 0
+	for i, v := range sleepingTimes[maxId] {
+		if v > maxMinuteVal {
+			maxMinuteVal = v
+			maxMinute = i
+		}
+	}
+
+	fmt.Println(maxId, maxMinute, maxId*maxMinute)
 }
