@@ -23,6 +23,7 @@ func readInput() []int {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer fi.Close()
 
 	scanner := bufio.NewScanner(fi)
 
